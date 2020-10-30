@@ -39,7 +39,8 @@
 #ifndef __BLE_UTILS_H__
 #define __BLE_UTILS_H__
 
-#include <asf.h>
+#include <Arduino.h>
+#include <stdio.h>
 
 #define BLE_CENTRAL					(0x01)
 #define BLE_PERIPHERAL				(0x02)

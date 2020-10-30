@@ -112,14 +112,13 @@
  * <A href="http://www.microchip.com">Microchip</A>.\n
  * \endcode
  */
-#include <asf.h>
+
 #include "common/include/nm_common.h"
 #include "driver/include/m2m_wifi.h"
 #include "driver/include/m2m_periph.h"
 #include "main21.h"
 #include "m2m_ble.h"
 #include "at_ble_api.h"
-#include "wifi_prov.h"
 
 #include "utils/ble_utils.h"
 

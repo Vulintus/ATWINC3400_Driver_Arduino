@@ -37,7 +37,6 @@
 #include "driver/include/m2m_types.h"
 #include "driver/include/m2m_wifi.h"
 #include "at_ble_api.h"
-#include "ble_manager.h"
 
 #define M2M_DEVICE_NAME				"WINC3400_00:00"
 #define MAC_ADDRESS					{0xf8, 0xf0, 0x05, 0x45, 0xD4, 0x84}

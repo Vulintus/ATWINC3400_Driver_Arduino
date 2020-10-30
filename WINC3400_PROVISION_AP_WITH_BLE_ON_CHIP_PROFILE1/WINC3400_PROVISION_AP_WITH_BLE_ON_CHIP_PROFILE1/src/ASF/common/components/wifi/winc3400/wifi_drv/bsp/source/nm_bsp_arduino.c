@@ -46,10 +46,10 @@
 #include "bsp/include/nm_bsp_arduino.h"
 #include "common/include/nm_common.h"
 
-int8_t gi8Winc1501CsPin = WINC1501_SPI_CS_PIN;
-int8_t gi8Winc1501ResetPin = WINC1501_RESET_PIN;
-int8_t gi8Winc1501IntnPin = WINC1501_INTN_PIN;
-int8_t gi8Winc1501ChipEnPin = WINC1501_CHIP_EN_PIN;
+int8_t gi8Winc3400CsPin = WINC3400_SPI_CS_PIN;
+int8_t gi8Winc3400ResetPin = WINC3400_RESET_PIN;
+int8_t gi8Winc3400IntnPin = WINC3400_INTN_PIN;
+int8_t gi8Winc3400ChipEnPin = WINC3400_CHIP_EN_PIN;
 
 static tpfNmBspIsr gpfIsr;
 
@@ -79,34 +79,34 @@ static void chip_isr(void)
  */
 static void init_chip_pins(void)
 {
-	if (gi8Winc1501ResetPin > -1)
+	if (gi8Winc3400ResetPin > -1)
 	{
 		/* Configure RESETN pin as output. */
-		pinMode(gi8Winc1501ResetPin, OUTPUT);
-		digitalWrite(gi8Winc1501ResetPin, HIGH);
+		pinMode(gi8Winc3400ResetPin, OUTPUT);
+		digitalWrite(gi8Winc3400ResetPin, HIGH);
 	}
 
 	/* Configure INTN pins as input. */
-	pinMode(gi8Winc1501IntnPin, INPUT);
+	pinMode(gi8Winc3400IntnPin, INPUT);
 
-	if (gi8Winc1501ChipEnPin > -1)
+	if (gi8Winc3400ChipEnPin > -1)
 	{
 		/* Configure CHIP_EN as pull-up */
-		pinMode(gi8Winc1501ChipEnPin, INPUT_PULLUP);
+		pinMode(gi8Winc3400ChipEnPin, INPUT_PULLUP);
 	}
 }
 
 static void deinit_chip_pins(void)
 {
-	if (gi8Winc1501ResetPin > -1)
+	if (gi8Winc3400ResetPin > -1)
 	{
-		digitalWrite(gi8Winc1501ResetPin, LOW);
-		pinMode(gi8Winc1501ResetPin, INPUT);
+		digitalWrite(gi8Winc3400ResetPin, LOW);
+		pinMode(gi8Winc3400ResetPin, INPUT);
 	}
 
-	if (gi8Winc1501ChipEnPin > -1)
+	if (gi8Winc3400ChipEnPin > -1)
 	{
-		pinMode(gi8Winc1501ChipEnPin, INPUT);
+		pinMode(gi8Winc3400ChipEnPin, INPUT);
 	}
 }
 
@@ -154,11 +154,11 @@ sint8 nm_bsp_deinit(void)
  */
 void nm_bsp_reset(void)
 {
-	if (gi8Winc1501ResetPin > -1)
+	if (gi8Winc3400ResetPin > -1)
 	{
-		digitalWrite(gi8Winc1501ResetPin, LOW);
+		digitalWrite(gi8Winc3400ResetPin, LOW);
 		nm_bsp_sleep(100);
-		digitalWrite(gi8Winc1501ResetPin, HIGH);
+		digitalWrite(gi8Winc3400ResetPin, HIGH);
 		nm_bsp_sleep(100);
 	}
 }
@@ -192,7 +192,7 @@ void nm_bsp_sleep(uint32 u32TimeMsec)
 void nm_bsp_register_isr(tpfNmBspIsr pfIsr)
 {
 	gpfIsr = pfIsr;
-	attachInterruptMultiArch(gi8Winc1501IntnPin, chip_isr, FALLING);
+	attachInterruptMultiArch(gi8Winc3400IntnPin, chip_isr, FALLING);
 }
 
 /*
@@ -207,8 +207,8 @@ void nm_bsp_register_isr(tpfNmBspIsr pfIsr)
 void nm_bsp_interrupt_ctrl(uint8 u8Enable)
 {
 	if (u8Enable) {
-		attachInterruptMultiArch(gi8Winc1501IntnPin, chip_isr, FALLING);
+		attachInterruptMultiArch(gi8Winc3400IntnPin, chip_isr, FALLING);
 	} else {
-		detachInterruptMultiArch(gi8Winc1501IntnPin);
+		detachInterruptMultiArch(gi8Winc3400IntnPin);
 	}
 }

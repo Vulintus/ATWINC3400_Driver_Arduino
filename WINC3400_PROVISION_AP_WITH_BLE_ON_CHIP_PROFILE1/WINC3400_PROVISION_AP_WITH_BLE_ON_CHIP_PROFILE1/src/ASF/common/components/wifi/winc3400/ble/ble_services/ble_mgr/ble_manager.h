@@ -39,60 +39,10 @@
 #ifndef __BLE_MANAGER_H__
 #define __BLE_MANAGER_H__
 
-
-
-#include <asf.h>
 #include <string.h>
 #include <stddef.h>
 #include "at_ble_api.h"
 #include "ble_utils.h"
-//Not for WINC3400
-//#include "platform.h"
-
-/**
-@defgroup sdk Atmel BLE SDK
-
-@{
-*/
-
-#if defined WIFI_PROVISIONING
-#include "wifi_provisioning.h"
-#define BLE_DEVICE_NAME             "MCHP_BLE"
-#endif /* WIFI_PROVISIONING */
-
-#if defined PROXIMITY_REPORTER
-#include "pxp_reporter.h"
-#define BLE_DEVICE_NAME             "MCHP-PXP"
-#endif /* PROXIMITY_REPORTER */
-
-#if defined PROXIMITY_MONITOR
-#include "pxp_monitor.h"
-#define BLE_DEVICE_NAME             "MCHP-MON"
-#endif /* PROXIMITY_MONITOR */
-
-#if (BLE_DEVICE_ROLE == BLE_OBSERVER)
-#include "ble_observer.h"
-#define BLE_DEVICE_NAME             "MCHP-OBS"
-#endif /* BLE_DEVICE_ROLE == BLE_OBSERVER) */
-
-#if defined ANP_CLIENT
-#include "ancs_profile.h"
-#define BLE_DEVICE_NAME             "MCHP-ANCS"
-#endif /* ANCS_CLIENT */
-
-#if defined TIP_CLIENT
-#include "time_info.h"
-#define BLE_DEVICE_NAME             "MCHP-TIP"
-#endif /* TIP_CLIENT */
-
-#if defined TRANSPARENT_SERVICE
-#define BLE_DEVICE_NAME             "MCHP-TRANS"
-#endif
-
-#if defined CSC_DEVICE
-#include "cscp.h"
-#define BLE_DEVICE_NAME             "MCHP-CSC"
-#endif /* CSC_DEVICE */
 
 /** @brief default device name */
 #ifndef BLE_DEVICE_NAME
@@ -251,14 +201,8 @@ typedef enum
 #define BLE_SCAN_DATA_HANDLER                               ble_observer_scan_data_handler
 #endif /* (BLE_DEVICE_ROLE == BLE_OBSERVER) */
 
-#if defined HEART_RATE_SERVICE
-	#define TOTAL_CHARACTERISTIC_NUM     3
-#elif (defined TRANSPARENT_SERVICE)
-	#define TOTAL_CHARACTERISTIC_NUM     3
-#else
-	//Default number of characteristics for a service is 1
-	#define TOTAL_CHARACTERISTIC_NUM     1
-#endif
+
+#define TOTAL_CHARACTERISTIC_NUM     1
 
 
 /** @brief Service UUID's */

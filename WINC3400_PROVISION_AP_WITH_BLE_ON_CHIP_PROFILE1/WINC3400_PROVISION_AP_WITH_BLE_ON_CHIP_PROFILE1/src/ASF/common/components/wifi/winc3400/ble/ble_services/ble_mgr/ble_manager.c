@@ -36,34 +36,11 @@
  *Support</a>
  */
 
-
-#include <asf.h>
 #include <string.h>
 #include "at_ble_api.h"
 #include "ble_manager.h"
 #include "ble_utils.h"
 
-#if defined LINK_LOSS_SERVICE
-#include "link_loss.h"
-#endif /* LINK_LOSS_SERVICE */
-
-#if defined IMMEDIATE_ALERT_SERVICE
-#include "immediate_alert.h"
-#endif /* IMMEDIATE_ALERT_SERVICE */
-
-#if defined TX_POWER_SERVICE
-#include "tx_power.h"
-#endif /* TX_POWER_SERVICE */
-
-#if defined PROXIMITY_REPORTER
-#include "pxp_reporter.h"
-#endif /* PROXIMITY_REPORTER */
-
-#if defined PROXIMITY_MONITOR
-#include "pxp_monitor.h"
-#endif /* PROXIMITY_MONITOR */
-
-//Add for WINC3400
 #define AT_BLE_EVENT_PARAM_MAX_SIZE 524
 
 /** @brief information of the connected devices */

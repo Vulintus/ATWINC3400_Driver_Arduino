@@ -86,9 +86,13 @@ static inline sint8 spi_rw_pio(uint8* pu8Mosi, uint8* pu8Miso, uint16 u16Sz)
 		
 		u16Sz--;
 		if (!u8SkipMiso)
-		pu8Miso++;
+		{
+			pu8Miso++;	
+		}
 		if (!u8SkipMosi)
-		pu8Mosi++;
+		{
+			pu8Mosi++;	
+		}
 	}
 
 	digitalWrite(gi8Winc3400CsPin, HIGH);

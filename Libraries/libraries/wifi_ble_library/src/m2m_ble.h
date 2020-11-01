@@ -40,6 +40,7 @@
 
 #define M2M_DEVICE_NAME				"WINC3400_00:00"
 #define MAC_ADDRESS					{0xf8, 0xf0, 0x05, 0x45, 0xD4, 0x84}
+#define BLE_EVENT_TIMEOUT           (0)
 
 sint8 m2m_ble_init(void);
 

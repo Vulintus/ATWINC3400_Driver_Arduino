@@ -142,10 +142,11 @@ sint8 nm_bus_init(uint8 *pvinit, uint32 req_serial_number)
 sint8 nm_bus_ioctl(uint8 u8Cmd, void* pvParameter)
 {
 	sint8 s8Ret = 0;
+    tstrNmSpiRw *pstrParam = NULL;
 	switch(u8Cmd)
 	{
 		case NM_BUS_IOCTL_RW:
-			tstrNmSpiRw *pstrParam = (tstrNmSpiRw *)pvParameter;
+			pstrParam = (tstrNmSpiRw *)pvParameter;
 			s8Ret = nm_spi_rw(pstrParam->pu8InBuf, pstrParam->pu8OutBuf, pstrParam->u16Sz);
 			break;
 		default:

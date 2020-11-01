@@ -253,12 +253,6 @@ NMI_API uint8 m2m_checksum(uint8 *buf, int sz);
  */
 sint8 hexstr_2_bytes(uint8 *pu8Out, uint8 *pu8In, uint8 u8SizeOut);
 
-/*!
- * @ingroup     COMMONAPI
- * @fn          void (*at_sb_printf)(const char *_format, ...);
- * @brief       Chooses which function to use in order to output debug.
- */
-NMI_API void (*at_sb_printf)(const char *_format, ...);
 #ifdef __cplusplus
 }
 #endif

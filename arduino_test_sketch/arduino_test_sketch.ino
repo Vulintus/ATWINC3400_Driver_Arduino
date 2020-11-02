@@ -1,4 +1,5 @@
 #include <m2m_ble.h>
+#include <WiFi101.h>
 
 // the setup function runs once when you press reset or power the board
 void setup(void)

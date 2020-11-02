@@ -286,12 +286,6 @@ size_t WiFiSocketClass::write(SOCKET sock, const uint8_t *buf, size_t size)
 		return 0;
 	}
 
-#ifdef CONF_PERIPH
-	// Network led ON (rev A then rev B).
-	m2m_periph_gpio_set_val(M2M_PERIPH_GPIO16, 0);
-	m2m_periph_gpio_set_val(M2M_PERIPH_GPIO5, 0);
-#endif
-
 	sint16 err;
 
 	while ((err = send(sock, (void *)buf, size, 0)) < 0) {
@@ -305,12 +299,6 @@ size_t WiFiSocketClass::write(SOCKET sock, const uint8_t *buf, size_t size)
 		}
 		m2m_wifi_handle_events(NULL);
 	}
-
-#ifdef CONF_PERIPH
-	// Network led OFF (rev A then rev B).
-	m2m_periph_gpio_set_val(M2M_PERIPH_GPIO16, 1);
-	m2m_periph_gpio_set_val(M2M_PERIPH_GPIO5, 1);
-#endif
 
 	return size;
 }
@@ -448,12 +436,6 @@ void WiFiSocketClass::handleEvent(SOCKET sock, uint8 u8Msg, void *pvMsg)
 		case SOCKET_MSG_RECVFROM: {
 			tstrSocketRecvMsg *pstrRecvMsg = (tstrSocketRecvMsg *)pvMsg;
 
-#ifdef CONF_PERIPH
-			// Network led ON (rev A then rev B).
-			m2m_periph_gpio_set_val(M2M_PERIPH_GPIO16, 0);
-			m2m_periph_gpio_set_val(M2M_PERIPH_GPIO5, 0);
-#endif
-
 			if (pstrRecvMsg->s16BufferSize <= 0) {
 				close(sock);
 			} else if (_info[sock].state == SOCKET_STATE_CONNECTED || _info[sock].state == SOCKET_STATE_BOUND) {
@@ -471,12 +453,6 @@ void WiFiSocketClass::handleEvent(SOCKET sock, uint8 u8Msg, void *pvMsg)
 				// not connected or bound, discard data
 				hif_receive(0, NULL, 0, 1);
 			}
-
-#ifdef CONF_PERIPH
-			// Network led OFF (rev A then rev B).
-			m2m_periph_gpio_set_val(M2M_PERIPH_GPIO16, 1);
-			m2m_periph_gpio_set_val(M2M_PERIPH_GPIO5, 1);
-#endif
 		}
 		break;
 
@@ -507,7 +483,11 @@ int WiFiSocketClass::fillRecvBuffer(SOCKET sock)
 
 	uint8 lastTransfer = ((sint16)size == _info[sock].recvMsg.s16BufferSize);
 
-	if (hif_receive(_info[sock].recvMsg.pu8Buffer, _info[sock].buffer.data, (sint16)size, lastTransfer) != M2M_SUCCESS) {
+	if (hif_receive((uint32)_info[sock].recvMsg.pu8Buffer, 
+                    _info[sock].buffer.data, 
+                    (sint16)size, 
+                    lastTransfer) != M2M_SUCCESS) 
+    {
 		return 0;
 	}
 

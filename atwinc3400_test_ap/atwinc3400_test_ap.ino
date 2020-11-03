@@ -1,4 +1,3 @@
-#include <m2m_ble.h>
 #include <WiFi101.h>
 
 /*

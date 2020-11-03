@@ -46,6 +46,8 @@
 #include "bsp/include/nm_bsp_arduino.h"
 #include "common/include/nm_common.h"
 
+uint32 gu32Jiffies1ms;
+
 int8_t gi8Winc3400CsPin = WINC3400_SPI_CS_PIN;
 int8_t gi8Winc3400ResetPin = WINC3400_RESET_PIN;
 int8_t gi8Winc3400IntnPin = WINC3400_INTN_PIN;

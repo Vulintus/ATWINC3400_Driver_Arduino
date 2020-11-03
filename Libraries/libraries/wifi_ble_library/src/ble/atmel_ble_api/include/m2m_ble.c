@@ -35,7 +35,7 @@
 #include "driver/include/m2m_wifi.h"
 #include "ble/atmel_ble_api/include/at_ble_api.h"
 #include "ble/atmel_ble_api/include/platform.h"
-#include "m2m_ble.h"
+#include "ble/atmel_ble_api/include/m2m_ble.h"
 
 //#define BLE_API_DBG 1
 
@@ -89,11 +89,11 @@ sint8 m2m_ble_init(void)
 	 if (at_ble_init((void*)&plf) != AT_BLE_SUCCESS)
 	 {
 		 M2M_ERR("Failed to initialise BLE API\n");
-		 return -1;
+		 return -2;
 	 }
 
 	 return M2M_SUCCESS;
- }
+}
 
 sint8 m2m_ble_event_get(at_ble_events_t *event, at_ble_event_parameter_t* params)
 {
@@ -104,7 +104,6 @@ sint8 m2m_ble_event_get(at_ble_events_t *event, at_ble_event_parameter_t* params
 	// This stimulates BLE operation.
 	while (m2m_wifi_handle_events(NULL) != M2M_SUCCESS){
 	}
-
 
 	return AT_BLE_SUCCESS;
 }

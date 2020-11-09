@@ -11,6 +11,9 @@ extern "C" {
     #include "driver/include/m2m_periph.h"
 }
 
+#include "vulintus_arduino_ble/GAP.h"
+#include "vulintus_arduino_ble/GATT.h"
+
 #include "vulintus_arduino_ble/local/BLELocalDevice.h"
 
 extern void wifi_cb(uint8_t u8MsgType, void *pvMsg);
@@ -122,12 +125,12 @@ namespace VulintusArduinoBLE
 
     void BLELocalDevice::setAdvertisedServiceUuid(const char* advertisedServiceUuid)
     {
-        //TO DO
+        GAP.setAdvertisedServiceUuid(advertisedServiceUuid);
     }
 
     void BLELocalDevice::setAdvertisedService(const BLEService& service)
     {
-        //TO DO
+        setAdvertisedServiceUuid(service.uuid());
     }
 
     void BLELocalDevice::setManufacturerData(const uint8_t manufacturerData[], int manufacturerDataLength)
@@ -142,7 +145,7 @@ namespace VulintusArduinoBLE
 
     void BLELocalDevice::setLocalName(const char *localName)
     {
-        //TO DO
+        GAP.setLocalName(localName);
     }
 
     /// <summary>
@@ -151,79 +154,82 @@ namespace VulintusArduinoBLE
     /// <param name="deviceName">The new device name</param>
     void BLELocalDevice::setDeviceName(const char* deviceName)
     {
-        at_ble_device_name_set((uint8_t *)deviceName, m2m_strlen((const uint8 *)deviceName));
+        GATT.setDeviceName(deviceName);
+        //at_ble_device_name_set((uint8_t *)deviceName, m2m_strlen((const uint8 *)deviceName));
     }
 
     void BLELocalDevice::setAppearance(uint16_t appearance)
     {
-        //TO DO
+        GATT.setAppearance(appearance);
     }
 
     void BLELocalDevice::addService(BLEService& service)
     {
-        //TO DO
+        GATT.addService(service);
     }
 
     int BLELocalDevice::advertise()
     {
-        //TO DO
-        return 0;
+        return GAP.advertise();
     }
 
     void BLELocalDevice::stopAdvertise()
     {
-        //TO DO
+        return GAP.stopAdvertise();
     }
 
     int BLELocalDevice::scan(bool withDuplicates)
     {
-        //TO DO
-        return 0;
+        return GAP.scan(withDuplicates);
     }
 
     int BLELocalDevice::scanForName(String name, bool withDuplicates)
     {
-        //TO DO
-        return 0;
+        return GAP.scanForName(name, withDuplicates);
     }
 
     int BLELocalDevice::scanForUuid(String uuid, bool withDuplicates)
     {
-        //TO DO
-        return 0;
+        return GAP.scanForUuid(uuid, withDuplicates);
     }
 
     int BLELocalDevice::scanForAddress(String address, bool withDuplicates)
     {
-        //TO DO
-        return 0;
+        return GAP.scanForAddress(address, withDuplicates);
     }
 
     void BLELocalDevice::stopScan()
     {
-        //TO DO
+        return GAP.stopScan();
     }
 
     BLEDevice BLELocalDevice::central()
     {
         //TO DO
-        return BLEDevice();
+        return ATT.central();
     }
 
     BLEDevice BLELocalDevice::available()
     {
         //TO DO
-        return BLEDevice();
+        return GAP.available();
     }
 
     void BLELocalDevice::setEventHandler(BLEDeviceEvent event, BLEDeviceEventHandler eventHandler)
     {
-        //TO DO
+        if (event == BLEDiscovered) 
+        {
+            GAP.setEventHandler(event, eventHandler);
+        } 
+        else 
+        {
+            ATT.setEventHandler(event, eventHandler);
+        }
     }
 
     void BLELocalDevice::setAdvertisingInterval(uint16_t advertisingInterval)
     {
-        //TO DO
+        GAP.setAdvertisingInterval(advertisingInterval);
     }
 
     void BLELocalDevice::setConnectionInterval(uint16_t minimumConnectionInterval, uint16_t maximumConnectionInterval)
@@ -233,22 +239,22 @@ namespace VulintusArduinoBLE
 
     void BLELocalDevice::setConnectable(bool connectable)
     {
-        //TO DO
+        GAP.setConnectable(connectable);
     }
 
     void BLELocalDevice::setTimeout(unsigned long timeout)
     {
-        //TO DO
+        ATT.setTimeout(timeout);
     }
 
     void BLELocalDevice::debug(Stream& stream)
     {
-        //TO DO
+        //empty
     }
 
     void BLELocalDevice::noDebug()
     {
-        //TO DO
+        //empty
     }
 
     /// <summary>

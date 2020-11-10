@@ -1,6 +1,8 @@
 #ifndef VULINTUS_ARDUINO_BLE_TYPED_CHARACTERISTIC_H
 #define VULINTUS_ARDUINO_BLE_TYPED_CHARACTERISTIC_H
 
+#include <Arduino.h>
+
 #include "vulintus_arduino_ble/BLECharacteristic.h"
 
 namespace VulintusArduinoBLE

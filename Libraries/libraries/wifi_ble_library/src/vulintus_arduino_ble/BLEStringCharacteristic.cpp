@@ -16,8 +16,8 @@ namespace VulintusArduinoBLE
     String BLEStringCharacteristic::value(void)
     {
         String str;
-        int length = BLECharacteristic::valueLength();
-        const uint8_t* val = BLECharacteristic::value();
+        int length = characteristic_value_size;
+        const uint8_t* val = characteristic_value;
 
         str.reserve(length);
 

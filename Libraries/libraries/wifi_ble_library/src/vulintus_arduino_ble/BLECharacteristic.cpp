@@ -1,274 +1,163 @@
-#include "vulintus_arduino_ble/BLEProperty.h"
-#include "vulintus_arduino_ble/local/BLELocalCharacteristic.h"
-#include "vulintus_arduino_ble/remote/BLERemoteCharacteristic.h"
 #include "vulintus_arduino_ble/BLECharacteristic.h"
+#include "vulintus_arduino_ble/BLEUuid.h"
+#include "vulintus_arduino_ble/ATT.h"
+#include "vulintus_arduino_ble/BLEProperty.h"
 
 namespace VulintusArduinoBLE
 {
-
     /// <summary>
     /// Empty default constructor
     /// </summary>
-    BLECharacteristic::BLECharacteristic() :
-        BLECharacteristic((BLELocalCharacteristic*)NULL)
+    BLECharacteristic::BLECharacteristic()
     {
-        //empty
+        characteristic_value_size = 0;
+        characteristic_value = NULL;
+        internal_characteristic.init_value = NULL;
+        is_fixed_length = false;
+        should_broadcast = false;
     }
 
-    BLECharacteristic::BLECharacteristic(BLELocalCharacteristic* local) :
-        _local(local),
-        _remote(NULL)
+    BLECharacteristic::BLECharacteristic(const char* uuid, uint8_t properties, int valueSize, bool fixedLength)
     {
-        if (_local) 
-        {
-            _local->retain();
-        }
-    }
+        characteristic_uuid = BLEUuid(uuid);
+        is_fixed_length = fixedLength;
+        should_broadcast = false;
 
-    BLECharacteristic::BLECharacteristic(BLERemoteCharacteristic* remote) :
-        _local(NULL),
-        _remote(remote)
-    {
-        if (_remote) 
-        {
-            _remote->retain();
-        }
-    }
+        internal_characteristic.uuid = *characteristic_uuid.get();
+        internal_characteristic.properties = (at_ble_char_properties_t) properties;
+        internal_characteristic.value_init_len = (uint16_t) valueSize;
+        internal_characteristic.value_max_len = (uint16_t) valueSize;
+        internal_characteristic.init_value = (uint8_t *) malloc(valueSize);
+        memset(internal_characteristic.init_value, 0, valueSize);
 
-    BLECharacteristic::BLECharacteristic(const char* uuid, uint8_t properties, int valueSize, bool fixedLength) :
-        BLECharacteristic(new BLELocalCharacteristic(uuid, properties, valueSize, fixedLength))
-    {
-        //empty
+        characteristic_value_size = internal_characteristic.value_init_len;
+        characteristic_value = (uint8_t *) malloc(valueSize);
+        memset(characteristic_value, 0, valueSize);
     }
 
     BLECharacteristic::BLECharacteristic(const char* uuid, uint8_t properties, const char* value) :
-        BLECharacteristic(new BLELocalCharacteristic(uuid, properties, value))
+        BLECharacteristic(uuid, properties, strlen(value))
     {
-        //empty
-    }
-
-    BLECharacteristic::BLECharacteristic(const BLECharacteristic& other)
-    {
-        _local = other._local;
-        if (_local) 
-        {
-            _local->retain();
-        }
-
-        _remote = other._remote;
-        if (_remote) 
-        {
-            _remote->retain();
-        }
+        memcpy(internal_characteristic.init_value, (uint8_t *) value, strlen(value));
+        writeValue(value);
     }
 
     BLECharacteristic::~BLECharacteristic()
     {
-        if (_local && _local->release() <= 0) 
+        if (internal_characteristic.init_value)
         {
-            delete _local;
-        }
-
-        if (_remote && _remote->release() <= 0) 
-        {
-            delete _remote;
+            free(internal_characteristic.init_value);
         }
     }
 
     const char* BLECharacteristic::uuid() const
     {
-        if (_local) 
-        {
-            return _local->uuid();
-        }
+        return characteristic_uuid.str();
+    }
 
-        if (_remote) 
-        {
-            return _remote->uuid();
-        }
-
-        return "";
+    at_ble_handle_t BLECharacteristic::GetCharacteristicValueHandle ()
+    {
+        return internal_characteristic.char_val_handle;
     }
 
     uint8_t BLECharacteristic::properties() const
     {
-        if (_local) 
-        {
-            return _local->properties();
-        }
+        return ((uint8_t) internal_characteristic.properties);
+    }
 
-        if (_remote) 
+    void BLECharacteristic::broadcast ()
+    {
+        if (internal_characteristic.properties & BLEProperty::BLEBroadcast)
         {
-            return _remote->properties();
+            should_broadcast = true;
         }
-
-        return 0;
+        else
+        {
+            should_broadcast = false;
+        }
     }
 
     int BLECharacteristic::valueSize() const
     {
-        if (_local) 
-        {
-            return _local->valueSize();
-        }
-
-        if (_remote) 
-        {
-            return _remote->valueLength();
-        }
-
-        return 0;
+        return ((int) characteristic_value_size);
     }
 
     const uint8_t* BLECharacteristic::value() const
     {
-        if (_local) 
-        {
-            return _local->value();
-        }
-
-        if (_remote) 
-        {
-            return _remote->value();
-        }
-
-        return NULL;
+        return characteristic_value;
     }
 
-    int BLECharacteristic::valueLength() const
+    int BLECharacteristic::readValue()
     {
-        if (_local) 
-        {
-            return _local->valueLength();
-        }
+        uint16_t bytes_read = 0;
 
-        if (_remote) 
-        {
-            return _remote->valueLength();
-        }
+        at_ble_status_t status = at_ble_characteristic_value_get(
+            internal_characteristic.char_val_handle,
+            characteristic_value,
+            &bytes_read);
 
-        return 0;
-    }
-
-    uint8_t BLECharacteristic::operator[] (int offset) const
-    {
-        if (_local) 
-        {
-            return (*_local)[offset];
-        }
-
-        if (_remote) 
-        {
-            return (*_remote)[offset];
-        }
-
-        return 0;
-    }
-
-    int BLECharacteristic::readValue(uint8_t value[], int length)
-    {
-        int bytesRead = 0;
-
-        if (_local) 
-        {
-            bytesRead = min(length, _local->valueLength());
-            memcpy(value, _local->value(), bytesRead);
-        }
-
-        if (_remote) 
-        {
-            // trigger a read if the updated value (notification/indication)
-            // has already been read and the characteristic is readable
-            if (_remote->updatedValueRead() && canRead()) 
-            {
-                if (!read()) 
-                {
-                    // read failed
-                    return 0;
-                }
-            }
-
-            bytesRead = min(length, _remote->valueLength());
-            memcpy(value, _remote->value(), bytesRead);
-        }
-
-        return bytesRead;
-    }
-
-    int BLECharacteristic::readValue(void* value, int length)
-    {
-        return readValue((uint8_t*)value, length);
-    }
-
-    int BLECharacteristic::readValue(uint8_t& value)
-    {
-        value = 0;
-        return readValue((uint8_t*)&value, sizeof(value));
-    }
-
-    int BLECharacteristic::readValue(int8_t& value)
-    {
-        value = 0;
-        return readValue((uint8_t*)&value, sizeof(value));
-    }
-
-    int BLECharacteristic::readValue(uint16_t& value)
-    {
-        value = 0;
-        return readValue((uint8_t*)&value, sizeof(value));
-    }
-
-    int BLECharacteristic::readValue(int16_t& value)
-    {
-        value = 0;
-        return readValue((uint8_t*)&value, sizeof(value));
-    }
-
-    int BLECharacteristic::readValue(uint32_t& value)
-    {
-        value = 0;
-        return readValue((uint8_t*)&value, sizeof(value));
-    }
-
-    int BLECharacteristic::readValue(int32_t& value)
-    {
-        value = 0;
-        return readValue((uint8_t*)&value, sizeof(value));
+        return status;
     }
 
     int BLECharacteristic::writeValue(const uint8_t value[], int length)
     {
-        if (_local) 
+        //Reset the memory being used to store the value
+        memset(characteristic_value, 0, characteristic_value_size);
+
+        //Determine how many bytes to fill with new data
+        int len_to_write = min(length, internal_characteristic.value_max_len);
+        if (is_fixed_length)
         {
-            return _local->writeValue(value, length);
+            if (len_to_write > characteristic_value_size)
+            {
+                len_to_write = characteristic_value_size;
+            }
         }
 
-        if (_remote) 
+        //Store the new value internally within this class
+        memcpy(characteristic_value, value, len_to_write);
+
+        //Determine if the characteristic size has changed
+        if (!is_fixed_length)
         {
-            return _remote->writeValue(value, length);
+            if (len_to_write != characteristic_value_size)
+            {
+                characteristic_value_size = len_to_write;
+            }
         }
 
-        return 0;
+        //Pass the new value along to the BLE module
+        at_ble_status_t status = at_ble_characteristic_value_set(
+            internal_characteristic.char_val_handle,
+            characteristic_value,
+            characteristic_value_size);
+
+
+        if (internal_characteristic.properties & BLEProperty::BLEIndicate) 
+        {
+            ATT.SendIndication(internal_characteristic.char_val_handle);
+        } 
+        else if (internal_characteristic.properties & BLEProperty::BLENotify) 
+        {
+            ATT.SendNotification(internal_characteristic.char_val_handle);
+        }
+
+        if (should_broadcast) 
+        {
+            //TO DO
+        }
+
+        return status;
+    }
+
+    int BLECharacteristic::writeValue(const char* value)
+    {
+        return writeValue((uint8_t*)value, strlen(value));
     }
 
     int BLECharacteristic::writeValue(const void* value, int length)
     {
         return writeValue((const uint8_t*)value, length);
-    }
-
-    int BLECharacteristic::writeValue(const char* value)
-    {
-        if (_local) 
-        {
-            return _local->writeValue(value);
-        }
-
-        if (_remote) 
-        {
-            return _remote->writeValue(value);
-        }
-
-        return 0;
     }
 
     int BLECharacteristic::writeValue(uint8_t value)
@@ -300,223 +189,4 @@ namespace VulintusArduinoBLE
     {
         return writeValue((uint8_t*)&value, sizeof(value));
     }
-
-    int BLECharacteristic::broadcast()
-    {
-        if (_local) 
-        {
-            return _local->broadcast();
-        }
-
-        return 0;
-    }
-
-    bool BLECharacteristic::written()
-    {
-        if (_local) 
-        {
-            return _local->written();
-        }
-
-        return false;
-    }
-
-    bool BLECharacteristic::subscribed()
-    {
-        if (_local) 
-        {
-            return _local->subscribed();
-        }
-
-        return false;
-    }
-
-    bool BLECharacteristic::valueUpdated()
-    {
-        if (_remote) 
-        {
-            return _remote->valueUpdated();
-        }
-
-        return false; 
-    }
-
-    void BLECharacteristic::addDescriptor(BLEDescriptor& descriptor)
-    {
-        if (_local) 
-        {
-            return _local->addDescriptor(descriptor);
-        }
-    }
-
-    BLECharacteristic::operator bool() const
-    {
-        return (_local != NULL) || (_remote != NULL);
-    }
-
-    BLELocalCharacteristic* BLECharacteristic::local()
-    {
-        return _local;
-    }
-
-    void BLECharacteristic::setEventHandler(int event, BLECharacteristicEventHandler eventHandler)
-    {
-        if (_local) 
-        {
-            _local->setEventHandler((BLECharacteristicEvent)event, eventHandler);
-        }
-
-        if (_remote) 
-        {
-            _remote->setEventHandler((BLECharacteristicEvent)event, eventHandler);
-        }
-    }
-
-    int BLECharacteristic::descriptorCount() const
-    {
-        if (_remote) 
-        {
-            return _remote->descriptorCount();
-        }
-
-        return 0;
-    }
-
-    bool BLECharacteristic::hasDescriptor(const char* uuid) const
-    {
-        return hasDescriptor(uuid, 0);
-    }
-
-    bool BLECharacteristic::hasDescriptor(const char* uuid, int index) const
-    {
-        if (_remote) 
-        {
-            int count = 0;
-            int numDescriptors = _remote->descriptorCount();
-
-            for (int i = 0; i < numDescriptors; i++) 
-            {
-                BLERemoteDescriptor* d = _remote->descriptor(i);
-
-                if (strcasecmp(uuid, d->uuid()) == 0) 
-                {
-                    if (count == index) 
-                    {
-                        return true;
-                    }
-
-                    count++;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    BLEDescriptor BLECharacteristic::descriptor(int index) const
-    {
-        if (_remote) 
-        {
-            return BLEDescriptor(_remote->descriptor(index));
-        }
-
-        return BLEDescriptor();
-    }
-
-    BLEDescriptor BLECharacteristic::descriptor(const char * uuid) const
-    {
-        return descriptor(uuid, 0);
-    }
-
-    BLEDescriptor BLECharacteristic::descriptor(const char * uuid, int index) const
-    {
-        if (_remote) 
-        {
-            int count = 0;
-            int numDescriptors = _remote->descriptorCount();
-
-            for (int i = 0; i < numDescriptors; i++) 
-            {
-                BLERemoteDescriptor* d = _remote->descriptor(i);
-
-                if (strcasecmp(uuid, d->uuid()) == 0) 
-                {
-                    if (count == index) 
-                    {
-                        return BLEDescriptor(d);
-                    }   
-
-                    count++;
-                }
-            }
-        }
-
-        return BLEDescriptor();
-    }
-
-    bool BLECharacteristic::canRead()
-    {
-        if (_remote) 
-        {
-            return (properties() & BLERead) != 0;
-        }
-
-        return false;
-    }
-
-    bool BLECharacteristic::read()
-    {
-        if (_remote) 
-        {
-            return _remote->read();
-        }
-
-        return false;
-    }
-
-    bool BLECharacteristic::canWrite()
-    {
-        if (_remote) 
-        {
-            return (properties() & (BLEWrite | BLEWriteWithoutResponse)) != 0;
-        }
-
-        return false;
-    }
-
-    bool BLECharacteristic::canSubscribe()
-    {
-        if (_remote) 
-        {
-            return (properties() & (BLENotify | BLEIndicate)) != 0;
-        }
-
-        return false;
-    }
-
-    bool BLECharacteristic::subscribe()
-    {
-        if (_remote) 
-        {
-            return _remote->writeCccd((properties() & BLEIndicate) ? 0x0002 : 0x0001);
-        }
-
-        return false;
-    }
-
-    bool BLECharacteristic::canUnsubscribe()
-    {
-        return canSubscribe();
-    }
-
-    bool BLECharacteristic::unsubscribe()
-    {
-        if (_remote) 
-        {
-            return _remote->writeCccd(0x0000);
-        }
-
-        return false;
-    }
 }
-

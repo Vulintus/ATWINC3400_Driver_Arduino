@@ -1,60 +1,37 @@
-/*
- *  Implementation of the ArduinoBLE API for the ATWINC3400
- *  Author: David Pruitt
- *  Date: 2 November 2020
- */
-
-#ifndef __VULINTUS_ARDUINO_BLESERVICE_H
-#define __VULINTUS_ARDUINO_BLESERVICE_H
+#ifndef __VULINTUS_ARDUINO_BLE_SERVICE_H
+#define __VULINTUS_ARDUINO_BLE_SERVICE_H
 
 #include <Arduino.h>
 
+#include "vulintus_arduino_ble/BLEUuid.h"
 #include "vulintus_arduino_ble/BLECharacteristic.h"
+#include "vulintus_arduino_ble/BLELinkedList.h"
+
+#define VULINTUS_BLE_MAX_CHARACTERISTICS_PER_SERVICE    3
 
 namespace VulintusArduinoBLE
 {
-    class BLELocalService;
-    class BLERemoteService;
-
     class BLEService
     {
         public:
+
             BLEService();
-            BLEService(const char* uuid);
-            BLEService(const BLEService& other);
-            virtual ~BLEService();
+            BLEService(const char * uuid);
+            ~BLEService();
 
-            const char* uuid() const;
+            void AddCharacteristic (BLECharacteristic &characteristic);
 
-            void addCharacteristic(BLECharacteristic& characteristic);
-
-            operator bool() const;
-
-            int characteristicCount() const;
-            bool hasCharacteristic(const char* uuid) const;
-            bool hasCharacteristic(const char* uuid, int index) const;
-            BLECharacteristic characteristic(int index) const;
-            BLECharacteristic characteristic(const char * uuid) const;
-            BLECharacteristic characteristic(const char * uuid, int index) const;
-
-        protected:
-            friend class GATTClass;
-
-            BLEService(BLELocalService* local);
-
-            BLELocalService* local();
-
-            void addCharacteristic(BLELocalCharacteristic* characteristic);
-
-        protected:
-            friend class BLEDevice;
-
-            BLEService(BLERemoteService* remote);
+            at_ble_handle_t GetServiceHandle ();
+            String GetServiceUUID ();
 
         private:
-            BLELocalService* _local;
-            BLERemoteService* _remote;
+            friend class BLELocalDevice;
+
+            at_ble_handle_t service_handle;
+            BLEUuid service_uuid;
+
+            BLELinkedList<BLECharacteristic*> service_characteristics;
     };
 }
 
-#endif /* __VULINTUS_ARDUINO_BLESERVICE_H */
+#endif /* __VULINTUS_ARDUINO_BLE_SERVICE_H */

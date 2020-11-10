@@ -1,10 +1,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "vulintus_arduino_ble/utility/BLEUuid.h"
+#include "vulintus_arduino_ble/BLEUuid.h"
 
 namespace VulintusArduinoBLE
 {
+    BLEUuid::BLEUuid()
+        : _str(NULL)
+    {
+        //empty
+    }
+
     BLEUuid::BLEUuid(const char * str) 
         : _str(str)
     {
@@ -48,6 +54,16 @@ namespace VulintusArduinoBLE
         {
             _at_ble_uuid.type = at_ble_uuid_type_t::AT_BLE_UUID_128;
         }
+    }
+
+    BLEUuid::~BLEUuid()
+    {
+        //empty
+    }
+
+    at_ble_uuid_t *BLEUuid::get()
+    {
+        return &_at_ble_uuid;
     }
 
     const char* BLEUuid::str() const

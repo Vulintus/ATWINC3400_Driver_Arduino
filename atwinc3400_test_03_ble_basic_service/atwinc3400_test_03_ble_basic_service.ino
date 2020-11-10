@@ -45,6 +45,7 @@ void setup()
 
     //Initialize the built-in LED on the SAMD21 Xplained Pro.
     pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, 0);
 
     //Set the pins that will be used to communicate with the ATWINC3400
     WiFi.setPins(WINC_SS, WINC_IRQ, WINC_RESET, WINC_EN);
@@ -65,31 +66,79 @@ void setup()
         WiFi.begin();
 
         //Initialize the BLE module
-        status = VulintusArduinoBLE::BLE.begin();
+        status = VulintusArduinoBLE::BLE.Begin();
         if (status == M2M_SUCCESS)
         {
             Serial.println("SUCCESS: BLE module initialized.");
 
             //Set the name of the BLE device
-            VulintusArduinoBLE::BLE.setDeviceName("ATWINC3400_TEST");
-
-            //Set the local name
-            VulintusArduinoBLE::BLE.setLocalName("ATWINC3400_LOCAL_NAME_TEST");
+            status = VulintusArduinoBLE::BLE.SetDeviceName("ATWINC3400_TEST");
+            if (status == at_ble_status_t::AT_BLE_SUCCESS)
+            {
+                Serial.println("SUCCESS: Set BLE device name.");
+            }
+            else
+            {
+                Serial.println("ERROR: Unable to set BLE device name");
+            }
 
             //Set the advertised service
-            VulintusArduinoBLE::BLE.setAdvertisedService(test_service);
+            VulintusArduinoBLE::BLE.SetAdvertisedService(test_service);
+            Serial.println("SUCCESS: Set the advertised service UUID");
 
             //Add a characteristic to the service
-            test_service.addCharacteristic(test_characteristic);
+            test_service.AddCharacteristic(test_characteristic);
+            Serial.println("SUCCESS: Added a characteristic to the service");
 
             //Add the service to the local device
-            VulintusArduinoBLE::BLE.addService(test_service);
-
+            status = VulintusArduinoBLE::BLE.AddService(test_service);
+            if (status == at_ble_status_t::AT_BLE_SUCCESS)
+            {
+                Serial.println("SUCCESS: Added service to local device. ");
+                String service_uuid = test_service.GetServiceUUID();
+                at_ble_handle_t service_handle = test_service.GetServiceHandle();
+                Serial.print("Service UUID: ");
+                Serial.print(service_uuid);
+                Serial.print(", Service Handle: ");
+                Serial.print((uint16_t) service_handle);
+                Serial.println();
+                Serial.print("Characteristic UUID: ");
+                Serial.print(test_characteristic.uuid());
+                Serial.print(", Characteristic Value Handle: ");
+                Serial.print((uint16_t) test_characteristic.GetCharacteristicValueHandle());
+                Serial.println();
+            }
+            else
+            {
+                Serial.println("ERROR: Unable to add service to local device.");
+            }
+            
             //Write an initial value to the characteristic
-            test_characteristic.writeValue(0);
-
+            status = test_characteristic.writeValue(0);
+            if (status == at_ble_status_t::AT_BLE_SUCCESS)
+            {
+                Serial.println("SUCCESS: Wrote new value to characteristic");
+            }
+            else
+            {
+                Serial.println("ERROR: Unable to write value to characteristic");
+            }
+            
             //Advertise our service
-            VulintusArduinoBLE::BLE.advertise();
+            status = VulintusArduinoBLE::BLE.Advertise();
+            if (status)
+            {
+                Serial.println("SUCCESS: Advertising");
+            }
+            else
+            {
+                Serial.println("ERROR: Unable to advertise successfully");
+            }
+
+            //Print the BLE device address
+            String ble_device_address = VulintusArduinoBLE::BLE.GetAddress(true);
+            Serial.print("BLE DEVICE ADDRESS: ");
+            Serial.println(ble_device_address);
         }
         else
         {
@@ -112,15 +161,16 @@ void loop()
     }
 
     //See if a "central" device has connected to this peripheral
-    VulintusArduinoBLE::BLEDevice central = VulintusArduinoBLE::BLE.central();
+    //VulintusArduinoBLE::BLEDevice central = VulintusArduinoBLE::BLE.central();
 
     //If so...
+    /*
     if (central)
     {
         Serial.print("Central device has connected: ");
         Serial.println(central.address());
 
-        //Update the characteristic while the central is connected.
+        
         while (central.connected())
         {
             unsigned long current_millis = millis();
@@ -135,4 +185,5 @@ void loop()
         Serial.print("Disconnected from central device: ");
         Serial.println(central.address());
     }
+    */
 }

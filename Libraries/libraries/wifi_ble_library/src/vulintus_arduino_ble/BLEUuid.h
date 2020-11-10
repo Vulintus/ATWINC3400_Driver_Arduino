@@ -28,7 +28,11 @@ namespace VulintusArduinoBLE
     class BLEUuid
     {
         public:
+            BLEUuid();
             BLEUuid(const char * str);
+            ~BLEUuid();
+
+            at_ble_uuid_t * get();
 
             const char* str() const;
             const uint8_t * data() const;

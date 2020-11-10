@@ -128,6 +128,13 @@ namespace VulintusArduinoBLE
         //First, make sure the _advertising flag is initially set to false
         currently_advertising = false;
 
+        uint8_t advertisingData[18];
+        advertisingData[0] = 0x11;
+        advertisingData[1] = 0x07;
+        memcpy(advertisingData + 2, advertised_service_uuid.data(), advertised_service_uuid.length());
+
+        /*
+
         //Now let's create the advertising data and the scan response data
         uint8_t advertisingData[31];
         uint8_t advertisingDataLen = 0;
@@ -169,12 +176,20 @@ namespace VulintusArduinoBLE
             scanResponseDataLen += (2 + localNameLen);
         }
 
+        
+
         //Attempt to set the advertising and the scan response data
         at_ble_status_t at_ble_adv_data_set_result = at_ble_adv_data_set(
             advertisingData, 
             advertisingDataLen, 
             scanResponseData, 
             scanResponseDataLen);
+        */
+
+        at_ble_status_t at_ble_adv_data_set_result = at_ble_adv_data_set(
+           advertisingData, sizeof(advertisingData), NULL, 0);
+
+        at_ble_set_dev_config(AT_BLE_GAP_PERIPHERAL_SLV);
 
         //Check to see if we were successful in doing so
         if (at_ble_adv_data_set_result != at_ble_status_t::AT_BLE_SUCCESS)

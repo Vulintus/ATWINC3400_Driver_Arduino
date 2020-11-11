@@ -125,34 +125,62 @@ namespace VulintusArduinoBLE
 
     int BLELocalDevice::Advertise ()
     {
+        //The following link is the most useful link that I have found for describing the format of advertising data:
+        //https://www.silabs.com/community/wireless/bluetooth/knowledge-base.entry.html/2017/02/10/bluetooth_advertisin-hGsf
+
+        //The following link defines the possible data types:
+        //https://www.bluetooth.com/specifications/assigned-numbers/generic-access-profile/
+
+        //The following link defines the possible advertising flags (useful if the chosen data type is 0x01):
+        //https://devzone.nordicsemi.com/f/nordic-q-a/29083/ble-advertising-data-flags-field-and-discovery
+        
         //First, make sure the _advertising flag is initially set to false
         currently_advertising = false;
 
-        uint8_t advertisingData[18];
-        advertisingData[0] = 0x11;
-        advertisingData[1] = 0x07;
-        memcpy(advertisingData + 2, advertised_service_uuid.data(), advertised_service_uuid.length());
-
-        /*
-
-        //Now let's create the advertising data and the scan response data
+        //Create an array of 31 bytes that we will use to store our advertising data.
+        //31 bytes is the maximum allowable number of bytes according to the BLE spec.
         uint8_t advertisingData[31];
+
+        //Create a variable that stores the actual number of bytes that we are using so far
         uint8_t advertisingDataLen = 0;
 
-        advertisingData[0] = 0x02;
-        advertisingData[1] = 0x01;
-        advertisingData[2] = 0x06;
-        advertisingDataLen += 3;
+        //Now, we need to place a few different pieces of information into our advertising data.
 
-        if (advertised_service_uuid.str() != NULL) 
+        //THE FOLLOWING LINES HAVE BEEN COMMENTED OUT
+        //Reason: It seems like the ATWINC3400 is automatically inserting these bytes into the 
+        //advertising data on its own. Whatever the case, I have noticed that when I insert them
+        //manually using the following code, then the BLE device doesn't show up on the scanner.
+
+        //First, let's place the appropriate flags into our advertising data
+        //advertisingData[0] = 0x02;  //This packet of data will be 2-bytes long (excluding the current byte)
+        //advertisingData[1] = BLEAdvertisingDataType::BLE_ADV_DATATYPE_FLAGS;
+        //advertisingData[2] = BLEAdvertisingFlags::BLE_GAP_ADV_FLAG_LE_GENERAL_DISC_MODE | 
+        //    BLEAdvertisingFlags::BLE_GAP_ADV_FLAG_BR_EDR_NOT_SUPPORTED;
+        //advertisingDataLen += 3;
+
+        //END OF LINES THAT HAVE BEEN COMMENTED OUT
+
+        //Next, let's place the UUID of the advertised service into the advertising data
+        if (advertised_service_uuid.str() != NULL)
         {
             int uuidLen = advertised_service_uuid.length();
             advertisingData[advertisingDataLen++] = 1 + uuidLen;
-            advertisingData[advertisingDataLen++] = (uuidLen > 2) ? 0x06 : 0x02;
+            advertisingData[advertisingDataLen++] = 
+                (uuidLen > 2) ? BLEAdvertisingDataType::BLE_ADV_DATATYPE_INCOMPLETE_LIST_UUID_128BIT 
+                              : BLEAdvertisingDataType::BLE_ADV_DATATYPE_INCOMPLETE_LIST_UUID_16BIT;
             memcpy(&advertisingData[advertisingDataLen], advertised_service_uuid.data(), uuidLen);
-
             advertisingDataLen += uuidLen;
         }
+
+        /* 
+         * The Scan response packet contains basic information about a Beacon.
+         * Once an advertising packet has been received by a scanning device (such as a mobile), 
+         * further information can be requested.  The Beacon responds with the Scan response packet.  
+         * After sending the scan response packet (this is sent just once) the Beacon will continue 
+         * broadcasting advertising packets. The package length is variable (up to 31 bytes), 
+         * depending on the length of the device name.
+         * Source: https://support.kontakt.io/hc/en-gb/articles/201492522-Scan-response-packet-structure
+         */
 
         uint8_t scanResponseData[31];
         uint8_t scanResponseDataLen = 0;
@@ -176,19 +204,14 @@ namespace VulintusArduinoBLE
             scanResponseDataLen += (2 + localNameLen);
         }
 
-        
-
         //Attempt to set the advertising and the scan response data
         at_ble_status_t at_ble_adv_data_set_result = at_ble_adv_data_set(
             advertisingData, 
             advertisingDataLen, 
             scanResponseData, 
             scanResponseDataLen);
-        */
 
-        at_ble_status_t at_ble_adv_data_set_result = at_ble_adv_data_set(
-           advertisingData, sizeof(advertisingData), NULL, 0);
-
+        //Indicate that this device is a peripheral
         at_ble_set_dev_config(AT_BLE_GAP_PERIPHERAL_SLV);
 
         //Check to see if we were successful in doing so
@@ -200,7 +223,7 @@ namespace VulintusArduinoBLE
 
         //Next, let's start advertising
         //TO DO: the parameters used here are simply copied from those used in the Atmel heart rate example
-        //TO DO: we may need to change the parameters to match what should actually be used here.
+        //TO DO: we may need to change the parameters in the future if these are not appropriate.
         at_ble_status_t at_ble_start_status = at_ble_adv_start(
             at_ble_adv_type_t::AT_BLE_ADV_TYPE_UNDIRECTED, 
             at_ble_adv_mode_t::AT_BLE_ADV_GEN_DISCOVERABLE,

@@ -160,18 +160,18 @@ void loop()
         Serial.println(cur_pulse);
     }
 
+    VulintusArduinoBLE::BLE.ProcessEvents();
+
     //See if a "central" device has connected to this peripheral
-    //VulintusArduinoBLE::BLEDevice central = VulintusArduinoBLE::BLE.central();
+    VulintusArduinoBLE::BLERemoteDevice central = VulintusArduinoBLE::BLE.GetCentralDevice();
 
     //If so...
-    /*
     if (central)
     {
         Serial.print("Central device has connected: ");
-        Serial.println(central.address());
+        Serial.println(central.GetAddress());
 
-        
-        while (central.connected())
+        while (central.IsConnected())
         {
             unsigned long current_millis = millis();
             if (current_millis >= (prev_millis + 200))
@@ -180,10 +180,11 @@ void loop()
                 char rand = random(0, 100);
                 test_characteristic.writeValue(rand);
             }
+
+            VulintusArduinoBLE::BLE.ProcessEvents();
         }
 
         Serial.print("Disconnected from central device: ");
-        Serial.println(central.address());
+        Serial.println(central.GetAddress());
     }
-    */
 }

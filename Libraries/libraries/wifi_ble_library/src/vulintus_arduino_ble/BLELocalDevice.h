@@ -5,6 +5,9 @@
 
 #include "vulintus_arduino_ble/BLEService.h"
 #include "vulintus_arduino_ble/BLELinkedList.h"
+#include "vulintus_arduino_ble/BLERemoteDevice.h"
+#include "vulintus_arduino_ble/ATT.h"
+#include "vulintus_arduino_ble/BLEPeerConnection.h"
 
 namespace VulintusArduinoBLE
 {
@@ -100,6 +103,8 @@ namespace VulintusArduinoBLE
             int Advertise ();
 
             String GetAddress (bool include_addr_type = false);
+            void ProcessEvents ();
+            BLERemoteDevice GetCentralDevice ();
 
         private:
 

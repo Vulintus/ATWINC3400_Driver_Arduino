@@ -306,5 +306,17 @@ namespace VulintusArduinoBLE
         return result;
     }
 
+    void BLELocalDevice::ProcessEvents()
+    {
+        ATT.ProcessEvents();
+    }
+
+    BLERemoteDevice BLELocalDevice::GetCentralDevice ()
+    {
+        BLEPeerConnection peer = ATT.GetFirstPeerConnectionOrDefault();
+        BLERemoteDevice remote_device = BLERemoteDevice(peer.peer_address, peer.connection_handle);
+        return remote_device;
+    }
+
     BLELocalDevice BLE;
 }

@@ -17,6 +17,11 @@
   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+/*
+    This version of the file has been modified to be a part of the 
+    Vulintus Arduino BLE library.
+*/
+
 #ifndef VULINTUS_ARDUINO_BLE_PROPERTY_H
 #define VULINTUS_ARDUINO_BLE_PROPERTY_H
 

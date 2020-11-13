@@ -59,13 +59,13 @@ void setup()
         WiFi.begin();
 
         //Initialize the BLE module
-        status = VulintusArduinoBLE::BLE.begin();
+        status = VulintusArduinoBLE::BLE.Begin();
         if (status == M2M_SUCCESS)
         {
             Serial.println("SUCCESS: BLE module initialized.");
 
             //Set the name of the BLE device
-            VulintusArduinoBLE::BLE.setDeviceName("ATWINC3400_TEST");
+            VulintusArduinoBLE::BLE.SetDeviceName("ATWINC3400_TEST");
         }
         else
         {

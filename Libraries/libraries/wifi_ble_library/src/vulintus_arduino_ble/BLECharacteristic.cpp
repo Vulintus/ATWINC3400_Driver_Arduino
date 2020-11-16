@@ -120,6 +120,8 @@ namespace VulintusArduinoBLE
             characteristic_value,
             &bytes_read);
 
+        characteristic_value_size = bytes_read;
+
         return status;
     }
 

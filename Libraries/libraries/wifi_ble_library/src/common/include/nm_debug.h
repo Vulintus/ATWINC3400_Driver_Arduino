@@ -32,6 +32,13 @@
  *
  */
 
+/*
+*   This file has been modified by David Pruitt for inclusion
+*   in the Vulintus BLE library.
+*
+*   Date: 1 December 2020
+*/
+
 #ifndef _NM_DEBUG_H_
 #define _NM_DEBUG_H_
 
@@ -58,7 +65,15 @@
 #define M2M_REQ(...)
 #define M2M_DBG(...)
 
+#define CONF_WINC_DEBUG 1
+
 #if (CONF_WINC_DEBUG == 1)
+
+extern void (*application_specific_printf_function) (const char* fmt, ...);
+
+#define CONF_WINC_PRINTF(...)                   if(application_specific_printf_function != NULL){application_specific_printf_function(__VA_ARGS__);}
+
+
 #define M2M_PRINT(...)							do{CONF_WINC_PRINTF(__VA_ARGS__);}while(0)
 #if (M2M_LOG_LEVEL >= M2M_LOG_ERROR)
 #undef M2M_ERR
@@ -105,6 +120,7 @@ static void M2M_PRINT(const char *_format, ...) // __attribute__ ((__format__ (M
 static void CONF_WINC_PRINTF(const char *_format, ...)
 {
 }
+
 #endif
 #endif
 

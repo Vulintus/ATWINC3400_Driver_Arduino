@@ -18,15 +18,10 @@
  * If the above conditions are not true, the pinouts should be changed to match
  * your setup.
  */
-//#define WINC_IRQ          	6     		//Digital input for the ATWINC3400 interrupt output.
-//#define WINC_SS 			PIN_SPI_SS  //Digital output for the ATWINC3400 SPI slave select.	
-//#define WINC_RESET        	A1          //Digital output for the ATWINC3400 reset input.
-//#define WINC_EN		       	7           //Digital output for the ATWINC3400 enable input.
-
-#define WINC_IRQ          	9     		//Digital input for the ATWINC3400 interrupt output.
-#define WINC_SS 			10  //Digital output for the ATWINC3400 chip select.	
-#define WINC_RESET        	7          //Digital output for the ATWINC3400 reset input.
-#define WINC_EN		       	8           //Digital output for the ATWINC3400 enable input.
+#define WINC_IRQ          	6     		//Digital input for the ATWINC3400 interrupt output.
+#define WINC_SS 			PIN_SPI_SS  //Digital output for the ATWINC3400 SPI slave select.	
+#define WINC_RESET        	A1          //Digital output for the ATWINC3400 reset input.
+#define WINC_EN		       	7           //Digital output for the ATWINC3400 enable input.
 
 #elif BOARD_NAME == VULINTUS_HABITRAK_V1
 

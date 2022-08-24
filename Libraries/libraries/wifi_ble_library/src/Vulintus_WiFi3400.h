@@ -17,14 +17,13 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef WIFI_H
-#define WIFI_H
+#ifndef VULINTUS_WIFI3400_H
+#define VULINTUS_WIFI3400_H
 
-#define WIFI_FIRMWARE_LATEST_MODEL_A "19.4.4"
-#define WIFI_FIRMWARE_LATEST_MODEL_B "19.6.1"
+#define WIFI_FIRMWARE_LATEST "1.4.1"
 
 // for backwards compatibility
-#define WIFI_FIRMWARE_REQUIRED WIFI_FIRMWARE_LATEST_MODEL_B
+#define WIFI_FIRMWARE_REQUIRED WIFI_FIRMWARE_LATEST
 
 #include <Arduino.h>
 
@@ -205,4 +204,4 @@ private:
 
 extern WiFiClass WiFi;
 
-#endif /* WIFI_H */
+#endif /* VULINTUS_WIFI3400_H */

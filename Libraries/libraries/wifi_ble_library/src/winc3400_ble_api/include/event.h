@@ -34,7 +34,7 @@ extern struct str_watched_event watched_event;
 
 void event_init(void);
 
-void event_post(uint16_t msg_id, uint16_t src_id, void * data);
+void winc3400_event_post(uint16_t msg_id, uint16_t src_id, void * data);
 
 uint32_t special_events_handler(uint16_t msg_id, uint16_t src_id, uint8_t* data);
 

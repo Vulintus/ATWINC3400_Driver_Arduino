@@ -24,7 +24,7 @@
 #ifndef WIFIMDNSRESPONDER_H
 #define WIFIMDNSRESPONDER_H
 
-#include "WiFi101.h"
+#include "Vulintus_WiFi3400.h"
 #include "WiFiUdp.h"
 
 class WiFiMDNSResponder {

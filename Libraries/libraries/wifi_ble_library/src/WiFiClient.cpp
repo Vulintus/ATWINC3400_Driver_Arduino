@@ -19,7 +19,7 @@
 
 #include "utility/WiFiSocket.h"
 
-#include "WiFi101.h"
+#include "Vulintus_WiFi3400.h"
 #include "WiFiClient.h"
 
 WiFiClient::WiFiClient()

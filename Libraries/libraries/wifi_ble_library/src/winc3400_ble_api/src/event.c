@@ -58,7 +58,7 @@ static void event_free(struct event* event)
     event_free_list = event;
 }
 
-void event_post(uint16_t msg_id, uint16_t src_id, void * data)
+void winc3400_event_post(uint16_t msg_id, uint16_t src_id, void * data)
 {
 
     // get a free event object
@@ -401,6 +401,6 @@ at_ble_status_t at_ble_event_get(at_ble_events_t* event, void* params,
 
 at_ble_status_t at_ble_event_user_defined_post(void* params)
 {
-    event_post(0xFFFF, 0xFFFF, params);
+    winc3400_event_post(0xFFFF, 0xFFFF, params);
     return AT_BLE_SUCCESS;
 }

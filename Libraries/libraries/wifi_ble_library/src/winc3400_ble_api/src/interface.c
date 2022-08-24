@@ -77,7 +77,7 @@ void platform_interface_callback(uint8_t* data, uint32_t len)
                     if(!special_events_handler(msg_id, src_id, NULL))
                     {
                         // post it into the event queue
-                        event_post(msg_id, src_id, NULL);
+                        winc3400_event_post(msg_id, src_id, NULL);
                     }
                     state = NMI_BLE_WAITING;
                 }
@@ -106,7 +106,7 @@ void platform_interface_callback(uint8_t* data, uint32_t len)
                 if(!special_events_handler(msg_id, src_id, &buff[cur_msg_start]))
                 {
                     // post it into the event queue
-                    event_post(msg_id, src_id, &buff[cur_msg_start]);
+                    winc3400_event_post(msg_id, src_id, &buff[cur_msg_start]);
                 }
 
             }

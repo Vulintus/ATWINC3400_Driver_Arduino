@@ -21,7 +21,7 @@
 
 #include "utility/WiFiSocket.h"
 
-#include "WiFi101.h"
+#include "Vulintus_WiFi3400.h"
 #include "WiFiUdp.h"
 
 /* Constructor. */

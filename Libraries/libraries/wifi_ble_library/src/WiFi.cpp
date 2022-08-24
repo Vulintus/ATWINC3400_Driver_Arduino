@@ -35,7 +35,7 @@
 
 #include "utility/WiFiSocket.h"
 
-#include "WiFi101.h"
+#include "Vulintus_WiFi3400.h"
 
 extern "C" {
   #include "bsp/include/nm_bsp.h"

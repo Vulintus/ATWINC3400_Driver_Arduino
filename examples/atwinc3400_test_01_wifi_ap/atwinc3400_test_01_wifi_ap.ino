@@ -1,6 +1,5 @@
 #include <Vulintus_WiFi3400.h>
 
-#define BOARD_NAME      VULINTUS_HABITRAK_V1
 #include "board_pin_definitions.h"
 
 WiFiServer server(80);

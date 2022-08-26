@@ -1,7 +1,6 @@
 #include <Vulintus_WiFi3400.h>
 #include <Vulintus_BLE3400.h>
 
-#define BOARD_NAME      VULINTUS_HABITRAK_V1
 #include "board_pin_definitions.h"
 
 sint8 status;
